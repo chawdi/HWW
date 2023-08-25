@@ -1,0 +1,76 @@
+---------------------------------------------------------------------------------------------------------------
+создание пользователей и авторов
+
+from django.contrib.auth.models import User
+from news.models import Author
+
+user1 = User.objects.create_user(username='user1', password='password1')
+user2 = User.objects.create_user(username='user2', password='password2')
+
+author1 = Author.objects.create(user=user1)
+author2 = Author.objects.create(user=user2)
+
+---------------------------------------------------------------------------------------------------------------
+создание категорий
+
+from news.models import Category
+
+category1 = Category.objects.create(name='Sports')
+category2 = Category.objects.create(name='Politics')
+category3 = Category.objects.create(name='Education')
+category4 = Category.objects.create(name='Technology')
+
+---------------------------------------------------------------------------------------------------------------
+создание статей и новостей
+
+from news.models import Post
+
+post1 = Post.objects.create(author=author1, post_type='article', title='Article 1', text='Text of article 1')
+post2 = Post.objects.create(author=author2, post_type='article', title='Article 2', text='Text of article 2')
+post3 = Post.objects.create(author=author1, post_type='news', title='News 1', text='Text of news 1')
+
+---------------------------------------------------------------------------------------------------------------
+присвоение категорий
+
+post1.categories.add(category1, category2)
+post2.categories.add(category2, category3)
+post3.categories.add(category1, category4)
+
+---------------------------------------------------------------------------------------------------------------
+создание комментариев
+
+from news.models import Comment
+
+comment1 = Comment.objects.create(post=post1, user=user1, text='Comment 1 for post 1')
+comment2 = Comment.objects.create(post=post1, user=user2, text='Comment 2 for post 1')
+comment3 = Comment.objects.create(post=post2, user=user1, text='Comment 1 for post 2')
+comment4 = Comment.objects.create(post=post3, user=user2, text='Comment for news 1')
+
+---------------------------------------------------------------------------------------------------------------
+функции like() и dislike()
+
+comment1.like()
+comment2.dislike()
+post2.like()
+
+---------------------------------------------------------------------------------------------------------------
+обновление рейтингов
+
+author1.update_rating()
+author2.update_rating()
+
+---------------------------------------------------------------------------------------------------------------
+вывод
+
+best_author = Author.objects.all().order_by('-rating').first()
+print(f"Best author: {best_author.user.username}, Rating: {best_author.rating}")
+
+best_post = Post.objects.all().order_by('-rating').first()
+print(f"Best post: {best_post.title}, Rating: {best_post.rating}, Author: {best_post.author.user.username}")
+print(f"Preview: {best_post.preview()}")
+
+best_post_comments = Comment.objects.filter(post=best_post)
+for comment in best_post_comments:
+    print(f"Date: {comment.creation_date}, User: {comment.user.username}, Rating: {comment.rating}, Text: {comment.text}")
+
+---------------------------------------------------------------------------------------------------------------
